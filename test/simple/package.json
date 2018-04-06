@@ -1,0 +1,11 @@
+{
+  "name": "simple",
+  "version": "1.0.0",
+  "index": "./simple.js",
+  "dependencies": {
+    "@mapbox/cmake-node-module": "file:../.."
+  },
+  "scripts": {
+    "install": "cmake-node-module"
+  }
+}
