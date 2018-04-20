@@ -1,5 +1,5 @@
 set(NODE_MODULE_NAN_VERSION "2.10.0")
-set(NODE_MODULE_MINIMUM_ABI 46) # Don't build node modules for versions earleier than Node 4
+set(NODE_MODULE_MINIMUM_ABI 46) # Don't build node modules for versions earlier than Node 4
 set(NODE_MODULE_CACHE_DIR ${CMAKE_CURRENT_LIST_DIR})
 
 
@@ -70,8 +70,8 @@ function(add_node_module NAME)
     endif()
 
 
-
     # Generate a target for every ABI
+    set(_TARGETS)
     foreach(_ABI IN LISTS _ABIS)
         set(_NODE_VERSION ${_NODE_ABI_${_ABI}_VERSION})
 
@@ -106,6 +106,8 @@ function(add_node_module NAME)
         # Generate the library
         set(_TARGET "${NAME}.abi-${_ABI}")
         add_library(${_TARGET} SHARED "${NODE_MODULE_CACHE_DIR}/empty.cpp")
+        list(APPEND _TARGETS "${_TARGET}")
+
 
         # C identifiers can only contain certain characters (e.g. no dashes)
         string(REGEX REPLACE "[^a-z0-9]+" "_" NAME_IDENTIFIER "${NAME}")
@@ -160,4 +162,12 @@ function(add_node_module NAME)
             )
         endif()
     endforeach()
+
+    # Add a target that builds all Node ABIs.
+    add_custom_target("${NAME}.all")
+    add_dependencies("${NAME}.all" ${_TARGETS})
+
+    # Add a variable that allows users to iterate over all of the generated/dependendent targets.
+    set("${NAME}::abis" "${_ABIS}" PARENT_SCOPE)
+    set("${NAME}::targets" "${_TARGETS}" PARENT_SCOPE)
 endfunction()
