@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 
 set -euo pipefail
-function finish { rm -rf build ; }
+function finish { rm -rf build lib ; }
 trap finish EXIT
 finish
 

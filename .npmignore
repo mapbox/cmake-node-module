@@ -1,3 +1,5 @@
 /node
 /nan
+/test
+/Makefile
 *.sublime-*
