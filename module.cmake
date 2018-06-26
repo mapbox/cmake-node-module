@@ -49,12 +49,15 @@ endfunction()
 
 
 function(add_node_module NAME)
-    cmake_parse_arguments("" "" "MINIMUM_NODE_ABI;NAN_VERSION;INSTALL_DIR;CACHE_DIR" "EXCLUDE_NODE_ABIS" ${ARGN})
+    cmake_parse_arguments("" "" "MINIMUM_NODE_ABI;NAN_VERSION;INSTALL_PATH;CACHE_DIR" "EXCLUDE_NODE_ABIS" ${ARGN})
     if(NOT _MINIMUM_NODE_ABI)
         set(_MINIMUM_NODE_ABI "${NODE_MODULE_MINIMUM_ABI}")
     endif()
     if (NOT _CACHE_DIR)
         set(_CACHE_DIR "${NODE_MODULE_CACHE_DIR}")
+    endif()
+    if (NOT _INSTALL_PATH)
+        set(_INSTALL_PATH "lib/{node_abi}/${NAME}.node")
     endif()
     get_filename_component(_CACHE_DIR "${_CACHE_DIR}" REALPATH BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
     if(_UNPARSED_ARGUMENTS)
@@ -174,15 +177,14 @@ function(add_node_module NAME)
             )
         endif()
 
-        # Copy the file to the installation directory, if provided.
-        if (_INSTALL_DIR)
-            get_filename_component(_INSTALL_DIR "${_INSTALL_DIR}" REALPATH BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
-            add_custom_command(
-                TARGET ${_TARGET}
-                POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${_TARGET}> "${_INSTALL_DIR}/$<TARGET_FILE_NAME:${_TARGET}>"
-            )
-        endif()
+        # Copy the file to the installation directory.
+        string(REPLACE "{node_abi}" "node-v${_ABI}" _OUTPUT_PATH "${_INSTALL_PATH}")
+        get_filename_component(_OUTPUT_PATH "${_OUTPUT_PATH}" ABSOLUTE "${CMAKE_CURRENT_SOURCE_PATH}")
+        add_custom_command(
+            TARGET ${_TARGET}
+            POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy "$<TARGET_FILE:${_TARGET}>" "${_OUTPUT_PATH}"
+        )
     endforeach()
 
     # Add a target that builds all Node ABIs.

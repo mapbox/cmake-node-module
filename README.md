@@ -1,5 +1,7 @@
 This project helps you build C++ modules for Node.js using the CMake meta build system.
 
+[![NPM](https://nodei.co/npm/@mapbox/cmake-node-module.png)](https://nodei.co/npm/node-addon-api/)
+
 While the default way of building Node.js C++ modules is to use [node-gyp](https://github.com/nodejs/node-gyp), there's no requirement to do so. If your project already uses CMake, for example, you can use this project to directly build C++ Node.js modules.
 
 Unlike other CMake-based Node.js module build scripts, this project allows you to generate **multiple ABI version of a Node.js module** within the same build through the use of _interface targets_.
@@ -41,7 +43,7 @@ You can change these variables before or after you've included the `.cmake` file
 add_node_module(<name>
                 [ NAN_VERSION <version> ]
                 [ MINIMUM_NODE_ABI <number> ]
-                [ INSTALL_DIR <directory> ]
+                [ INSTALL_PATH <path> ]
                 [ CACHE_DIR <directory> ]
                 [ EXCLUDE_NODE_ABIS <number> [<number>...] ]
                )
@@ -51,9 +53,9 @@ Use this function to create a new Node.js module target. It will create a target
 
 * `NAN_VERSION` (unset by default): Semver of the [Nan](https://github.com/nodejs/nan) abstraction library module. This CMake script will download the headers separately and won't install them as an NPM module. It will only add the Nan headers to the build if this variable is set.
 * `MINIMUM_NODE_ABI` (defaults to `46`: Specify the minimum ABI that your module supports. This script will generate targets for all ABIs that are equal or newer to this ABI. The Node.js website has an [overview of all versions and how they map to ABIs](https://nodejs.org/en/download/releases/).
-* `INSTALL_DIR` (unset by default): When set, the linked node modules will be copied to this directory. The directory is relative to the directory of the `CMakeLists.txt` file that you call the `add_node_module` function from. You can e.g. specify `lib` to have them copied to the `lib` folder in your module folder.
+* `INSTALL_PATH` (defaults to `lib/{node_abi}/<name>.node`): The finished node modules will be copied to this path. The path is relative to the directory of the `CMakeLists.txt` file that you call the `add_node_module` function from. Specify `"module_path": "./lib/{node_abi}"` in your `package.json` to have `node-pre-gyp` package the correct folder.
 * `CACHE_DIR` (defaults to the value of `NODE_MODULE_CACHE_DIR`): directory where the Node.js and Nan headers are cached to avoid redownloading them. The directory is relative to the directory of the `CMakeLists.txt` file that you call the `add_node_module` function from. By default, they will be stored in the build directory. However, if you have multiple builds (e.g. for different platforms), you can specify a common directory to share them.
-* `EXCLUDE_NODE_ABIS`: A list of Node.js ABIs that won't be build. You can use this to exclude old unstable versions (e.g. 5.x = `47`, and 7.x = `51`). See <https://nodejs.org/en/download/releases/> for a list of ABIs (`NODE_MODULE)_VERSION`).
+* `EXCLUDE_NODE_ABIS`: A list of Node.js ABIs that won't be built. You can use this to exclude old unstable versions (e.g. 5.x = `47`, and 7.x = `51`). See <https://nodejs.org/en/download/releases/> for a list of ABIs (`NODE_MODULE_VERSION`).
 
 This function adds another custom target called `<name>.all` that you can use to request builds for all selected ABIs in your build system scripts.
 
