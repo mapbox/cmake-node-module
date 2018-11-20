@@ -1,4 +1,6 @@
-cmake_minimum_required(VERSION 3.4)
+# We need CMake 3.9 because the Xcode generator doesn't know about systems include paths before 3.9.
+# See https://gitlab.kitware.com/cmake/cmake/issues/16795
+cmake_minimum_required(VERSION 3.9)
 
 if (NOT NODE_MODULE_MINIMUM_ABI)
     set(NODE_MODULE_MINIMUM_ABI 46) # Don't build node modules for versions earlier than Node 4
@@ -146,14 +148,14 @@ function(add_node_module NAME)
             "_FILE_OFFSET_BITS=64"
         )
 
-        target_include_directories(${_TARGET} PRIVATE
+        target_include_directories(${_TARGET} SYSTEM PRIVATE
             "${_CACHE_DIR}/node/${_NODE_VERSION}"
         )
 
         if(_NAN_VERSION)
             # Nan requires C++11. Use a compile option to allow interfaces to override this with a later version.
             target_compile_options(${_TARGET} PRIVATE -std=c++11)
-            target_include_directories(${_TARGET} PRIVATE
+            target_include_directories(${_TARGET} SYSTEM PRIVATE
                 "${_CACHE_DIR}/nan/${_NAN_VERSION}"
             )
         endif()

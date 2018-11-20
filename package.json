@@ -1,6 +1,6 @@
 {
   "name": "@mapbox/cmake-node-module",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Build Node.js C++ modules with CMake",
   "author": "Konstantin Käfer <mail@kkaefer.com>",
   "license": "ISC",
